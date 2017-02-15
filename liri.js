@@ -1,10 +1,9 @@
+var fs = require("fs");
 
-
-//userInput1 = process.argv[2];
-//userInput2 = process.argv[3];
+userInput1 = process.argv[2];
+userInput2 = process.argv[3];
 
 var logger = function(input) {
-  var fs = require("fs");
   console.log(input);
   fs.appendFile("log.txt", input + "\n", function(err) {
     });
@@ -34,15 +33,9 @@ var twitterQueryUser = function() {
 
 //Twitter Query 2
 var twitterQuery = function() {
-  inquirer.prompt([
-   {
-      type: "input",
-      message: "Type in your Twitter query:",
-      name: "query"
-   }
-  ]).then(function(user) {
 
-      client.get('search/tweets', {q: user.query}, function(error, tweets, response) {
+
+      client.get('search/tweets', {q: userInput2}, function(error, tweets, response) {
         for (var key in tweets.statuses) {
           logger("");
           logger("@" + tweets.statuses[key].user.screen_name);
@@ -51,25 +44,16 @@ var twitterQuery = function() {
         }
       });
 
-  });
-
 };
 
 //Spotify Query
 var spotify = require('spotify');
-//var spotifySong = userInput2;
+var spotifySong = userInput2;
  
 var spotifyQuery = function() {
 
-  inquirer.prompt([
-   {
-      type: "input",
-      message: "Type in your Spotify query:",
-      name: "query"
-   }
-  ]).then(function(user) {
 
-    spotify.search({ type: 'track', query: user.query }, function(err, data) {
+    spotify.search({ type: 'track', query: spotifySong}, function(err, data) {
         if ( err ) {
             logger('Error occurred: ' + err);
             return;
@@ -100,23 +84,15 @@ var spotifyQuery = function() {
         logger(data.tracks.items[0].album.name);
         } 
     });
-  });
+
 };
 
 //Movie Query
 var movieQuery = function() {
 
-  inquirer.prompt([
-   {
-      type: "input",
-      message: "Type in your movie query:",
-      name: "query"
-   }
-  ]).then(function(user) {
-
     var request = require("request");
-    //var movie = userInput2;
-    request(`https://api.themoviedb.org/3/search/movie?api_key=65df1022a70a9ad63fbfa028ad61d139&language=en-US&query=${user.query}&page=1&include_adult=false`, function(err, response) {
+    var movie = userInput2;
+    request(`https://api.themoviedb.org/3/search/movie?api_key=65df1022a70a9ad63fbfa028ad61d139&language=en-US&query=${userInput2}&page=1&include_adult=false`, function(err, response) {
        if ( err ) {
                 logger('Error occurred: ' + err);
                 return;
@@ -147,16 +123,15 @@ var movieQuery = function() {
             logger(movieObj.results[0].overview);
           }
     });
-  });
 };
 
 //Do What it Says
 var doItQuery = function() {
-  var fs = require("fs");
   fs.readFile("random.txt", "utf8", function(err, response) {
     var doItArr = response.split(", ");
     var command1 = doItArr[0];
     var command2 = doItArr[1];
+
 
   var exec = require('child_process').exec;
   var cmd = `node liri.js ${command1} ${command2}`;
@@ -169,39 +144,26 @@ var doItQuery = function() {
 
 
 
-var inquirer = require("inquirer");
-  inquirer.prompt([
 
-    {
-      type: "list",
-      message: "Tell LIRI what to do!",
-      choices: ["my-tweets", "search-tweets", "spotify-this-song", "movie-this", "do-what-it-says"],
-      name: "command"
-    }
-    
-  ]).then(function(user) {
-
-      switch(user.command) {
-      case "my-tweets":
-        twitterQueryUser();
-        break;
-      case "search-tweets":
-        twitterQuery();
-        break;
-      case "spotify-this-song":
-        spotifyQuery();
-        break;
-      case "movie-this":
-        movieQuery();
-        break;
-      case "do-what-it-says":
-        doItQuery();
-        break;
-      default:
-        logger("Invalid Command!");
-      }
-
-  });
+switch(userInput1) {
+case "my-tweets":
+  twitterQueryUser();
+  break;
+case "search-tweets":
+  twitterQuery();
+  break;
+case "spotify-this-song":
+  spotifyQuery();
+  break;
+case "movie-this":
+  movieQuery();
+  break;
+case "do-what-it-says":
+  doItQuery();
+  break;
+default:
+  logger("Invalid Command!");
+}
 
 
 
